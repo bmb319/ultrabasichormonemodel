@@ -16,7 +16,7 @@ from VMATH import *
 from comp_model import *
 
 z = np.zeros(25) 
-def comp_model(z,t):
+def comp_model(t,z):
   dz = np.zeros(len(z)) 
 
 ## ------------------ Histamine neuron model -------------------------------
@@ -35,21 +35,21 @@ def comp_model(z,t):
 #z[11] E2 bound to GPER (uM)
 
 ## Histamine neuron constants. 
-  b1 = 15  #HA leakage from the cytosol to the extracellular space.
-  b2 = 3.5  #HA release per action potential.
-  b3 = 0.05  #HA removal from the extracellular space
-  b4 = 0.25  #Strength of stabilization of bHT to bHT0. #(fitted)
-  b5 =  2.4875 #From cHT to HTpool. (fitted)
+  b1 = 15.013  #HA leakage from the cytosol to the extracellular space #(fitted)
+  b2 =  (0.8)*8.355 #9.5086 #3.5   #HA release per action potential #(fitted) 
+  b3 = 0.05  #HA removal from the extracellular space #(fitted) 
+  b4 = 0.25  #Strength of stabilization of bHT to bHT0 #(fitted)
+  b5 =  2.4875 #From cHT to HTpool. #(fitted)
   b6 = 1.424 #From HTpool to cHT. #(fitted)
-  b7 =  1.083 #1.077585 #Other uses of HT remove HT. #(fitted)
+  b7 =  1.083 #1.077585 #Other uses of HT remove HT.#(fitted)
 
   b8 = 100 #Histamine bound to autoreceptors produce G∗ #(fitted)
   b9 = 961.094 #T∗ facilitates the reversion of G∗ to G #(fitted)
   b10 = 8.792311243082075 #G∗ produces T∗ #(fitted)
-  b11 = 74 #66.2992 #85 #66.2992 #decay coefficient of T∗ 
+  b11 = 74 #decay coefficient of T∗ #(fitted)
   b12 = 4.5  #eHA binds to autoreceptors #(fitted)
-  b13 = 65.61789 #eHA dissociates from autoreceptors 
-  g0HH = 10  #Total g-coupled protein for H3 on HA neuron
+  b13 = 65.6196645577152 #eHA dissociates from autoreceptors #(fitted)
+  g0HH = 10  #Total g-coupled protein for H3 on HA neuron #(fitted)
   t0HH = 12.643209422616819 #Total T protein for H3 on HA neuron #(fitted)
   b0HH = 11  # 10 Total bound H3 receptors on HA neuron #(fitted)
   b14 = 99.9915191655649 #E2 bound to GPER produce G∗ in HA neuron #(fitted)
@@ -63,28 +63,33 @@ def comp_model(z,t):
   b0GPER = 10  #Total bound E2 in GPER in HA neuron. #(fitted)
 
 #Steady state values.
-  gstar_ha_basal = 0.5445288879050081 #0.7114  #Equilibrium concentration of g* histamine in H3 receptor. 
-  gstar_E2_basal =  0.7221 #Equilibrium concentration of g* E2 in GPER receptor.
+  gstar_ha_basal =  0.70955  #Equilibrium concentration of g* histamine in H3 receptor. #(fitted)
+  gstar_E2_basal =   0.8029 #Equilibrium concentration of g* E2 in GPER receptor #(fitted)
   bht0 = 100 #Steady state value of blood histidine. #(fitted)
-  basal_bound_ce2 =  0.9553926590454308 #1.04
+  basal_bound_ce2 =  0.955 #(fitted)
+
+
 
 #Synapse
   dz[0] = inhibsynHAtoHA(z[6], gstar_ha_basal) * activ_E2_to_ha_syn_neuron(z[24], basal_bound_ce2) * VHTDC(z[4])  - VMATH(z[0], z[1]) -  VHNMT(z[0]) - b1*(z[0] - z[2]) + VHAT(z[2])
 
   dz[1] = VMATH(z[0], z[1]) - inhibRHAtoHA(z[6], gstar_ha_basal)*activ_E2_to_ha_R_neuron(z[9], gstar_E2_basal)*fireha(t)*b2*z[1]
 
+  
   dz[2] = inhibRHAtoHA(z[6], gstar_ha_basal)*activ_E2_to_ha_R_neuron(z[9], gstar_E2_basal)*fireha(t)*b2*z[1] - VHAT(z[2]) + b1*(z[0] - z[2])  - b3*z[2] 
 
+
+  
   dz[3] = HTin(t) - VHTL(z[3])  - b4*(z[3] - bht0) #(fitted)
 
-  dz[4] = VHTL(z[3]) - inhibsynHAtoHA(z[6], gstar_ha_basal) * activ_E2_to_ha_syn_neuron(z[24], basal_bound_ce2) * VHTDC(z[4]) - b5*z[4] + b6*z[5]
+  dz[4] = VHTL(z[3]) - inhibsynHAtoHA(z[6], gstar_ha_basal) * activ_E2_to_ha_syn_neuron(z[24], basal_bound_ce2) * VHTDC(z[4]) - b5*z[4] + b6*z[5] #(fitted)
 
   dz[5] = b5*z[4] - b6*z[5] - b7*z[5] #(fitted)
 
 #autoreceptors
   dz[6]  = b8*z[8]**2*(g0HH - z[6]) - b9*z[7]*z[6] #(fitted)
-  dz[7] = b10*z[6]**1.9*(t0HH - z[7])  - b11*z[7] #(fitted)
-  dz[8] = b12*z[2]*(b0HH - z[8])  - b13*z[8] 
+  dz[7] = b10*z[6]**2*(t0HH - z[7])  - b11*z[7] #(fitted)
+  dz[8] = b12*z[2]*(b0HH - z[8])  - b13*z[8] #(fitted)
 
 #GPER
   dz[9]  = b14*z[11]**2*(g0GPER - z[9]) - b15*z[10]*z[9] #(fitted)

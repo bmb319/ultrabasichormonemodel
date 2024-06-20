@@ -5,5 +5,5 @@
 # Units in uM. 
 def inhibRHAtoHA(b, c):
   #b = gstar
-  a = 1 - (3.5)*(b - c)     
+  a = 1 - (0.2 * 3.5)*(b - c)     
   return a

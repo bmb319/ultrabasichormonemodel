@@ -5,6 +5,6 @@
 # c = vha
 def VMATH(b, c):
   km = 24        
-  vmax =  10552
+  vmax =  8500 #10552
   a = (vmax*(b/(km + b)) - 5.*c)
   return a

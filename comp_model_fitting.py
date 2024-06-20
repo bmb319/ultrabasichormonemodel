@@ -15,7 +15,7 @@ from BPin import *
 from BE2in import *
 
 #Initial conditions
-#z0 = [3.1968, 140.3708, 1.4717,  100, 300, 298.31, 0.7114, 0.628942699789106, 1.0084, 0.7221, 1.3593, 1.0084, 150, 3,	140,	0.7205,1,1, 5.36792170e-02,  3.28039657e-03, 2.47918457e-02,  6.30086107e-04, 2.27306535e-04,  2.42721849e-04, 1] 
+#z0 = [3.1968, 142.55, 1.4717,  100, 300, 298.31, 0.88, 0.628942699789106, 1.0084, 0.9, 1.3593, 1.0084, 150, 3,	140,	0.7205,1,1, 5.36792170e-02,  3.28039657e-03, 2.47918457e-02,  6.30086107e-04, 2.27306535e-04,  2.42721849e-04, 1]
 
 
 import numpy as np
@@ -29,27 +29,31 @@ import numpy as np
 def comp_model_fitting(x): 
 
   dz = np.zeros(1) 
-  z = np.array([0.7114])
-  #q = x[0]
-  #fitting z6
-  g0HH =  4.940277777777778 # 10
-  z6 =  0.7114
-  b8 = 100 #Histamine bound to autoreceptors produce G∗ 
-  b9 = 961.094 #T∗ facilitates the reversion of G∗ to G
-  b10 = 8.792311243082075 #G∗ produces T∗ #(fitted)
-  b11 = 85 #66.2992 #decay coefficient of T∗ 
-  z8 = 1.0084
-  z7 = 0.628942699789106
+  z = np.array([1.4717])
+  #fitting z2
 
+  z0 = 3.1968
+  z1 = 142.55
+  z6 = 0.88
+  z9 = 0.9
+  
 
-  dz[0]  = b8*z8**2*(g0HH - z[0]) - b9*z7*z[0] #(fitted)
+  b1 = 15.013  #HA leakage from the cytosol to the extracellular space (fitted)
+  b2 = 8.355059385177153 #9.5086 #3.5   #HA release per action potential.
+  b3 = 0.05  #HA removal from the extracellular space (fitted) 
+  
 
-
-
-
+  gstar_ha_basal =  0.70955  #Equilibrium concentration of g* histamine in H3 receptor. (fitted) 
+  gstar_E2_basal =  0.8029051932417229 #0.7221 #Equilibrium concentration of g* E2 in GPER receptor.(fitted) 
+  
+ 
+  dz[0] = inhibRHAtoHA(z6, gstar_ha_basal)*activ_E2_to_ha_R_neuron(z9, gstar_E2_basal)*fireha(0)*b2*z1 - VHAT(z[0]) + b1*(z0 - z[0])  - b3*z[0] 
 
 
   #si hay una t valriable, ponemos t=0 
 
 
   return dz
+
+
+#tried improving a dampening term, a feedback mechanism...

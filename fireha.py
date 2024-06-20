@@ -1,7 +1,11 @@
 ## Histamine firing function. 
 #DOI:
 # Units in events/h.
+
 import numpy as np
+from scipy.integrate import odeint
+import matplotlib.pyplot as plt
+
 def fireha(t):
   f = 1
   r = 12.5
@@ -18,3 +22,4 @@ def fireha(t):
   else:
       f = basal + r*(np.exp(-b*(time - t_stop)) - np.exp(-b*time))
   return f
+
