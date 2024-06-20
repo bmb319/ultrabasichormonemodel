@@ -19,6 +19,10 @@ z = np.zeros(25)
 def comp_model(t,z):
   dz = np.zeros(len(z)) 
 
+
+
+
+  
 ## ------------------ Histamine neuron model -------------------------------
 ## Histamine neuron variables
 #z[0] Cytosolic histamine (uM)
